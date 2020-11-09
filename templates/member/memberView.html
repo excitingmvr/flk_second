@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>memberView</title>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script type="text/javascript" src="/static/js/common.js?ver=0.0.8"></script>
+</head>
+ 
+<body>
+ <br>seq: {{rt.ifmbSeq | seqEncode}}
+  <br>pageThis: {{ request.args.get("pageThis") }}
+  <br>Admin: {{rt.ifmbAdminNy | displayNy}}
+  <br>FirstName: {{rt.ifmbFirstName}}
+  <br>LastName: {{rt.ifmbLastName}}
+  <br>Id: {{rt.ifmbId}}
+  <!-- <br>Password: {{rt.ifmbPassword}} -->
+  <br>Gender: {{rt.ifmbGenderCd | displayGender}}
+  <br>Date of birth: {{rt.ifmbDob}}
+  <br>agree to get email: {{rt.ifmbEmailAuthNy | displayNy}}
+  <br>Nickname: {{rt.ifmbNickName}}
+  <br>ifmbDormantNy: {{rt.ifmbDormantNy | displayNy}}
+  <br>Introduction:{{rt.ifmbIntroduction | nl2br}}
+  <br>file1 : 
+  <br>
+  <style>
+    #sectionAttached_file1::after, #sectionAttached_file2::after{
+     content: ''; 
+     display: block; 
+     clear: both 
+    }
+  </style>
+  <div id="sectionAttached_file1">
+  {% for rtFile1 in rtFiles1 %}
+  <div style="width: 100px; float: left;">
+    <img src="{{rtFile1.deftFilePath}}/{{rtFile1.deftFileNameSystem}}.{{rtFile1.deftFileExtension}}" width="100px" height="100px"><p><a href="{{rtFile1.deftFilePath}}/{{rtFile1.deftFileNameSystem}}.{{rtFile1.deftFileExtension}}" download="{{rtFile1.deftFileNameOriginal}}">{{rtFile1.deftFileNameOriginal | setReduceString(8)}}</a></a></p>
+  </div>
+  {% endfor %}
+</div>
+
+  <br>file2 :
+  <div id="sectionAttached_file2">
+  {% for rtFile2 in rtFiles2 %}
+  <a href="{{rtFile2.deftFilePath}}/{{rtFile2.deftFileNameSystem}}.{{rtFile2.deftFileExtension}}" download="{{rtFile2.deftFileNameOriginal}}">{{rtFile2.deftFileNameOriginal}}</a><br>
+  {% endfor %}
+</div>
+  <br>RegIp: {{rt.ifmbRegIp}}
+  <br>RegSeq: {{rt.ifmbRegSeq}}
+  <br>RegOffset: {{rt.ifmbRegOffset}}
+  <br>RegDatetime: {{rt.ifmbRegDatetime}}
+  <br>RegDeviceCd: {{rt.ifmbRegDeviceCd | displayDevice}}
+  <br>ModIp: {{rt.ifmbModIp}}
+  <br>ModSeq: {{rt.ifmbModSeq}}
+  <br>ModOffset: {{rt.ifmbModOffset}}
+  <br>ModDatetime: {{rt.ifmbModDatetime}}
+  <br>ModDeviceCd: {{rt.ifmbModDeviceCd | displayDevice}}
+  <br>Sys: {{rt.ifmbSys}}
+  <br>DelNy: {{rt.ifmbDelNy | displayNy}}
+  <br>
+  <a href="/member/uelete?pageThis={{request.args.get('pageThis')}}&seq={{rt.ifmbSeq|seqEncode}}{% if request.args.get('searchOption') != None %}&searchOption={{request.args.get('searchOption')}}&searchValue={{request.args.get('searchValue')}}{% endif %}">Uelete</a>
+  <a href="/member/delete?pageThis={{request.args.get('pageThis')}}&seq={{rt.ifmbSeq|seqEncode}}{% if request.args.get('searchOption') != None %}&searchOption={{request.args.get('searchOption')}}&searchValue={{request.args.get('searchValue')}}{% endif %}">Delete</a>
+  <a href="/member/form?pageThis={{request.args.get('pageThis')}}&seq={{rt.ifmbSeq|seqEncode}}{% if request.args.get('searchOption') != None %}&searchOption={{request.args.get('searchOption')}}&searchValue={{request.args.get('searchValue')}}{% endif %}">Edit</a>
+  <a href="/member/list?pageThis={{request.args.get('pageThis')}}{% if request.args.get('searchOption') != None %}&searchOption={{request.args.get('searchOption')}}&searchValue={{request.args.get('searchValue')}}{% endif %}">list</a>
+
+
+   
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>memberForm</title>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/common.js?ver=0.0.8"></script>
+</head>
+<body>
+    {% if rt.ifmbSeq %}
+    <form id="mainUpdateForm" method="POST" action="/member/update" enctype="multipart/form-data">
+        <input type="hidden" name="ifmbSeq" value="{{rt.ifmbSeq | seqEncode}}">
+    {% else %}
+    <form id="mainInsertForm" method="POST" action="/member/insert" enctype="multipart/form-data">
+    {% endif %}
+    <input type="hidden" name="pageThis" value="{{request.args.get('pageThis')}}">
+    <input type="hidden" name="seq" value="{{request.args.get('seq')}}">
+    <input type="hidden" name="searchOption" value="{{request.args.get('searchOption')}}">
+    <input type="hidden" name="searchValue" value="{{request.args.get('searchValue')}}">
+        seq: 
+        <br>Admin:
+            <select name="ifmbAdminNy">
+                <option value="0" {% if rt.ifmbAdminNy == 0 %}selected{% endif %}>N</option>
+                <option value="1" {% if rt.ifmbAdminNy == 1 %}selected{% endif %}>Y</option>
+            </select>
+        <br>FirstName: <input type="text" name="ifmbFirstName" value="{{rt.ifmbFirstName}}">
+        <br>LastName: <input type="text" name="ifmbLastName" value="{{rt.ifmbLastName}}">
+        <br>Id: <input type="text" name="ifmbId" value="{{rt.ifmbId}}">
+        <p id="commentId"></p>
+        {% if rt.ifmbSeq %}
+            <!-- pass -->
+        {% else %}
+        <br>Password: <input type="password" name="ifmbPassword" value="">
+        <p id=commentPassword></p>
+        <br>Re Password: <input type="password" name="ifmbPasswordRe" value="">
+        {% endif %}
+        <p id="commentPasswordRe"></p>
+        <br>Gender: 
+            <select name="ifmbGenderCd">
+                <option value="0" {% if rt.ifmbGenderCd == 0 %}selected{% endif %}>::Choose::</option>
+                <option value="1" {% if rt.ifmbGenderCd == 1 %}selected{% endif %}>Male</option>
+                <option value="2" {% if rt.ifmbGenderCd == 2 %}selected{% endif %}>Femle</option>
+                <option value="3" {% if rt.ifmbGenderCd == 3 %}selected{% endif %}>Etc</option>
+            </select>
+        <br>Date of birth:
+            <select name="dobYear">
+                <option value="0">::Year::</option>
+                {% for i in range(1940,2020) %}
+                <option value="{{i}}" {% if rt.ifmbDob %} {% if rt.ifmbDob.strftime('%Y') == i %} selected {% endif %} {% endif %}>{{i}}</option>
+                {% endfor %}                 
+            </select>  
+            <select name="dobMonth">
+                <option value="0">::Month::</option>
+                {% for i in range(1,13) %}
+                <option value="{{i}}" {% if rt.ifmbDob %} {% if rt.ifmbDob.strftime('%m') == i %} selected {% endif %} {% endif %}>{{i}}</option>
+                {% endfor %}                 
+            </select>  
+            <select name="dobDay">
+                <option value="0">::Day::</option>
+                {% for i in range(1,32) %}
+                <option value="{{i}}" {% if rt.ifmbDob %} {% if rt.ifmbDob.strftime('%d') == i %} selected {% endif %} {% endif %}>{{i}}</option>
+                {% endfor %}                 
+            </select>
+        <br>agree to get email:
+            <select name="ifmbEmailAuthNy">
+                <option value="0" {% if rt.ifmbEmailAuthNy == 0 %}selected{% endif %}>N</option>
+                <option value="1" {% if rt.ifmbEmailAuthNy == 1 %}selected{% endif %}>Y</option>
+            </select>
+        <br>Nickname: <input type="text" name="ifmbNickName" value="{{rt.ifmbNickName}}">
+         <br><br><!--{{rt.ifmbIntroduction}} -->
+        <textarea name="ifmbIntroduction" rows="4" cols="50">{{ rt.ifmbIntroduction }}</textarea>
+        <style>
+            #sectionAttached_file1::after, #sectionAttached_file2::after{
+             content: ''; 
+             display: block; 
+             clear: both 
+            }
+          </style>
+        <br>ssss {{rtFiles1|length}} , {{rtFiles2|length}} {{rtFiles1TotalSize}}
+        <div id="sectionAttached_file1">
+        <button class="attachedButton" type="button" data-inputfilename="file1">upload images</button><input type="file" name="file1" multiple="multiple" data-type="image" data-maxfilenum="5" data-maximagefilesize="25165824" style="display: none;"> <span id="boardAttachedSize_file1">0</span><span>/5M</span>
+        <div id="boardAttached_file1" style="height: 100px;">
+            {% for rtFile1 in rtFiles1 %}
+                <div id="attached_file1_{{rtFile1.deftFileOrder}}" style="width: 100px; float: left;">
+                    <img src="{{rtFile1.deftFilePath}}/{{rtFile1.deftFileNameSystem}}.{{rtFile1.deftFileExtension}}" width="100px" height="100px"><p><span onclick="deleteAttached('file1', '{{rtFile1.deftFileOrder}}', '{{rtFile1.deftFileSize | bytesToMega}}')" style="cursor:pointer">X</span> {{rtFile1.deftFileNameOriginal | setReduceString(8)}}</p>
+                </div>
+            {% endfor %}
+        </div>
+        </div>
+        <br>
+        <div id="sectionAttached_file2">
+        <button class="attachedButton" type="button" data-inputfilename="file2">upload files</button><input type="file" name="file2" multiple="multiple" data-type="noimage" style="display: none;"> <span id="boardAttachedSize_file2">0</span><span>/5M</span>
+        <div id="boardAttached_file2" style="height: 100px;">
+            {% for rtFile2 in rtFiles2 %}
+            <p id="attached_file2_{{rtFile2.deftFileOrder}}"><span onclick="deleteAttached('file2', '{{rtFile2.deftFileOrder}}', '{{rtFile2.deftFileSize | bytesToMega}}')" style=cursor:pointer>X</span> {{rtFile2.deftFileNameOriginal}}</p>
+                <!-- <a href="{{rtFile2.deftFilePath}}/{{rtFile2.deftFileNameSystem}}.{{rtFile2.deftFileExtension}}" download="{{rtFile2.deftFileNameOriginal}}">{{rtFile2.deftFileNameOriginal}}</a><br> -->
+            {% endfor %}
+        </div>
+        </div>
+        <br><p onclick="commonTest()">sadfasdfasd</p>
+        <br>RegIp: {{rt.ifmbRegIp}}
+        <br>RegSeq: {{rt.ifmbRegSeq}}
+        <br>RegOffset: {{rt.ifmbRegOffset}}
+        <br>RegDatetime: {{rt.ifmbRegDatetime}}
+        <br>RegDeviceCd: {{rt.ifmbRegDeviceCd}}
+        <br>ModIp: {{rt.ifmbModIp}}
+        <br>ModSeq: {{rt.ifmbModSeq}}
+        <br>ModOffset: {{rt.ifmbModOffset}}
+        <br>ModDatetime: {{rt.ifmbModDatetime}}
+        <br>ModDeviceCd: {{rt.ifmbModDeviceCd}}
+        <br>Sys: {{rt.ifmbSys}}
+        <br>DelNy:{{rt.ifmbDelNy}}
+        <!-- <br><input type="submit"> -->
+        <!-- <br><a href="" onclick="preSubmit();">제출</a> -->
+        <button id="mainFormButton" type="button" >submit</button>
+    </form>
+    
+    <br><a href="/member/list?pageThis={{request.args.get('pageThis')}}{% if request.args.get('searchOption') != None %}&searchOption={{request.args.get('searchOption')}}&searchValue={{request.args.get('searchValue')}}{% endif %}">list</a>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#commentId").hide();
+            $("#commentPassword").hide();
+            $("#commentPasswordRe").hide();
+            $("#boardAttachedSize_file1").text(bytesToMega("{{rtFiles1TotalSize}}"));
+            $("#boardAttachedSize_file2").text(bytesToMega("{{rtFiles2TotalSize}}"));
+        });
+
+
+        mainInsertValidation = function(){
+            if(!checkNull($.trim($("input[name=ifmbFirstName]").val()), "First Name")) return false;
+            if(!checkNull($.trim($("input[name=ifmbLastName]").val()), "Last Name")) return false;
+            if(!checkNull($.trim($("input[name=ifmbId]").val()), "Id")) return false;
+            if(!checkId($.trim($("input[name=ifmbId]").val()))){
+                alert("4~20,0-9a-zA-Z._-");
+                return false;
+            }
+            if(!checkNull($.trim($("input[name=ifmbPassword]").val()), "Password")) return false;
+            if(!checkPassword($.trim($("input[name=ifmbPassword]").val()))){
+                alert("8~20,0-9a-zA-Z!@#$%^&*");
+                return false;
+            }
+            if(!checkNull($.trim($("input[name=ifmbPasswordRe]").val()), "PasswordRe")) return false;
+            if($.trim($("input[name=ifmbPassword]").val()) != $.trim($("input[name=ifmbPasswordRe]").val())){
+                alert("mismatched Password");
+                return false;
+            }          
+            if(!checkNullSelect($("select[name=ifmbGenderCd]").val(),"Gender")) return false;
+            if(!checkDob($("select[name=dobYear]").val(), $("select[name=dobMonth]").val(), $("select[name=dobDay]").val(),"choose all")) return false;
+            return true;
+        }
+
+
+        mainUpdateValidation = function(){
+            // 수정시 validation 이 insert 시와 틀린 경우 "if(!mainInsertValidation()) return fasle;" 삭제 후 구현
+            if(!mainInsertValidation()) return fasle;
+            return true;
+        }        
+
+
+        $("#mainFormButton").on("click", function(){
+            if($(this).parents("form").attr("id") == "mainInsertForm") {
+                if(mainInsertValidation() == true){
+                    $("#mainInsertForm").submit();
+                } else {
+                    return false;
+                }
+            } else {    // (parents("form").attr("id")) == "mainUpdateForm")
+                if(mainUpdateValidation() == true){
+                    $("#mainUpdateForm").submit();
+                } else {
+                    return false;
+                }
+            }
+        });
+
+
+        $("input[name=ifmbId]").on("focusout", function(){
+            if($("input[name=ifmbId]").val()){
+                if(!checkId($.trim($("input[name=ifmbId]").val()))){
+                    $("#commentId").show();
+                    $("#commentId").text("4~20,number,Eng,.,_,-");
+                    return false;
+                }
+                $.ajax({
+                    url:'/member/ajxCheckId',
+                    type:'post',
+                    data:{'Id': $("input[name=ifmbId]").val()},
+                    success: function(rt) {
+                        if(Number(rt) > 0){
+                            $("#commentId").show();
+                            $("#commentId").text('사용 불가능!');
+                        } else {
+                            $("#commentId").show();
+                            $("#commentId").text('사용 가능!');
+                        }
+                    },
+                    error: function(err) {
+                        // pass
+                    }
+                });
+            } else {
+                $("#commentId").hide();
+            }
+        });
+
+        
+        $("input[name=ifmbPassword]").on("keyup", function(){
+            if($.trim($("input[name=ifmbPassword]").val())){
+                if(!checkPassword($.trim($("input[name=ifmbPassword]").val()))){
+                        $("#commentPassword").show();
+                        $("#commentPassword").text("8~20,number,Eng,.,_,-");
+                } else {
+                    $("#commentPassword").show();
+                    $("#commentPassword").text("Possible");
+                }
+            } else {
+                // pass 
+            }
+
+            if($.trim($("input[name=ifmbPasswordRe]").val())){
+                if(($.trim($("input[name=ifmbPassword]").val())) == ($.trim($("input[name=ifmbPasswordRe]").val()))){
+                    $("#commentPasswordRe").show();
+                    $("#commentPasswordRe").text("matched");
+                } else {
+                    $("#commentPasswordRe").show();
+                    $("#commentPasswordRe").text("mismatched");
+                }
+            } else {
+                // pass 
+            }
+
+        });
+
+
+        $("input[name=ifmbPasswordRe]").on("keyup", function(){
+            if(($.trim($("input[name=ifmbPassword]").val())) == ($.trim($("input[name=ifmbPasswordRe]").val()))){
+                $("#commentPasswordRe").show();
+                $("#commentPasswordRe").text("matched");
+            } else {
+                $("#commentPasswordRe").show();
+                $("#commentPasswordRe").text("mismatched");
+            }
+        });
+
+    </script>
+</body>
+</html>
+
+
+        <!-- {% if rt.ifmbDob %}
+            <input type="text" name="dobYear" value="{{rt.ifmbDob.strftime('%Y')}}">
+            <input type="text" name="dobMonth" value="{{rt.ifmbDob.strftime('%m')}}">
+            <input type="text" name="dobDay" value="{{rt.ifmbDob.strftime('%d')}}">
+        {% else %}
+            <input type="text" name="dobYear">
+            <input type="text" name="dobMonth">
+            <input type="text" name="dobDay">
+        {% endif %} -->

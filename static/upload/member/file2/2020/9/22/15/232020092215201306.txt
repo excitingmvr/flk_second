@@ -1,0 +1,252 @@
+centos2
+
+-- root 패스워드 생성
+sudo passwd
+
+-- root로 전환
+su -
+
+
+-- 날짜 확인
+date
+mv /etc/localtime /etc/localtime_org
+ln -s /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+date
+
+
+-- ssh root 및 text 로그인 허용
+vi /etc/ssh/sshd_config
+38 PermitRootLogin yes
+63 PasswordAuthentication yes
+64 #PermitEmptyPasswords no
+65 #PasswordAuthentication no
+
+systemctl restart sshd.service
+
+
+-- httpd 설치
+rpm -qa | grep httpd
+yum -y install httpd
+/usr/sbin/httpd -k start
+ps -ef | grep httpd
+/usr/sbin/httpd -k stop
+ps -ef | grep httpd
+
+
+-- php 설치
+rpm -qa | grep epel
+yum -y install epel-release
+rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+yum --enablerepo=remi-php73 -y install php
+
+-- httpd.conf 수정
+vi /etc/httpd/conf/httpd.conf
+164     DirectoryIndex index.html index.htm index.php
+285     AddType application/x-httpd-php .php .html .htm .inc
+286     AddType application/x-httpd-php-source .phps
+
+-- phpinfo.php
+vi /var/www/html/phpinfo.php
+
+<?php
+phpinfo();
+?>
+
+/usr/sbin/httpd -k start
+
+브라우져에서 확인
+ip
+ip/phpinfo.php
+
+/usr/sbin/httpd -k stop 
+
+-- vhost
+vi /etc/httpd/conf/httpd.conf
+96 ServerName 34.64.150.241
+358 # virtual host
+359 Include /etc/httpd/conf/extra/*.conf
+
+mkdir -p /etc/httpd/conf/extra
+
+vi /etc/httpd/conf/extra/httpd-vhosts_root.conf
+<VirtualHost *:80>
+        ServerAdmin     account@yourdomain.com
+        DocumentRoot    /var/www/html
+        # ServerName      yourdomain
+
+        ErrorLog        /var/log/httpd/error_log
+        CustomLog       /var/log/httpd/access_log combined
+
+        <Directory /var/www/html >
+                Require all granted
+                AllowOverride All
+        </Directory>
+</VirtualHost>
+
+vi /etc/httpd/conf/extra/httpd-vhosts_girlsday_1_0.conf
+<VirtualHost *:80>
+        ServerAdmin     account@yourdomain.com
+        DocumentRoot    /factory/workspace_php/girlsday_1_0/htdocs
+        ServerName      aitest.kaionex.com
+
+        ErrorLog        /var/log/httpd/girlsday_1_0/error_log
+        CustomLog       /var/log/httpd/girlsday_1_0/access_log combined
+
+        <Directory /factory/workspace_php/girlsday_1_0/htdocs>
+                Require all granted
+                AllowOverride All
+        </Directory>
+</VirtualHost>
+
+vi /etc/httpd/conf/extra/httpd-vhosts_girlsday_1_1.conf
+<VirtualHost *:80>
+        ServerAdmin     account@yourdomain.com
+        DocumentRoot    /factory/workspace_php/girlsday_1_1/htdocs
+        ServerName      ai.kaionex.com
+
+        ErrorLog        /var/log/httpd/girlsday_1_1/error_log
+        CustomLog       /var/log/httpd/girlsday_1_1/access_log combined
+
+        <Directory /factory/workspace_php/girlsday_1_1/htdocs>
+                Require all granted
+                AllowOverride All
+        </Directory>
+</VirtualHost>
+
+mkdir -p /factory/workspace_php/girlsday_1_0/htdocs
+mkdir -p /factory/workspace_php/girlsday_1_1/htdocs
+
+vi /factory/workspace_php/girlsday_1_0/htdocs/index.html
+vi /factory/workspace_php/girlsday_1_1/htdocs/index.html
+
+mkdir -p /var/log/httpd/girlsday_1_0
+mkdir -p /var/log/httpd/girlsday_1_1
+
+/usr/sbin/httpd -k start
+
+브라우져에서 ip, ai, aitest 도메인 확인
+
+/usr/sbin/httpd -k stop 
+
+
+--- curl 처리
+mkdir -p /opt/remi/php73/curl/
+vi /etc/php.ini
+1677 curl.cainfo = /opt/remi/php73/curl/cacert.pem
+
+sftp로 파일 업로드
+
+/usr/sbin/httpd -k start
+
+브라우져에서 ip/phpinfo.php 에서 확인
+
+/usr/sbin/httpd -k stop
+
+--- gd 설치
+yum --enablerepo=remi-php73 -y install php-gd
+
+/usr/sbin/httpd -k start
+
+브라우져에서 ip/phpinfo.php 에서 확인
+
+/usr/sbin/httpd -k stop 
+
+
+--- bcmath 설치
+yum --enablerepo=remi-php73 -y install php-bcmath
+
+/usr/sbin/httpd -k start
+
+브라우져에서 ip/phpinfo.php 에서 확인
+
+/usr/sbin/httpd -k stop 
+
+--- composer 설치
+yum -y install php-cli php-zip wget unzip
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+HASH="$(wget -q -O - https://composer.github.io/installer.sig)"
+php -r "if (hash_file('SHA384', 'composer-setup.php') === '$HASH') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+php –r "unlink(‘composer-setup.php’);"
+-> -bash: syntax error near unexpected token `('
+
+
+--- google cloud vision api 설치
+cd /factory/workspace_php/girlsday_1_0/htdocs/
+composer require google/cloud-vision
+
+cd /factory/workspace_php/girlsday_1_1/htdocs/
+composer require google/cloud-vision
+
+cd
+
+--- web source upload
+sftp 로 파일 업로드
+
+/usr/sbin/httpd -k start
+
+정상적으로 보여지는지 확인
+
+----- mariadb
+vi /etc/yum.repos.d/mariadb.repo
+[mariadb]
+name = MariaDB
+baseurl = http://yum.mariadb.org/10.4/centos7-amd64
+gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+gpgcheck=1
+
+rpm -qa | grep MariaDB
+yum -y install MariaDB
+systemctl start mariadb
+ps -ef | grep mysqld
+systemctl stop mariadb
+ps -ef | grep mysqld
+systemctl start mariadb
+
+** /usr/bin/mysqladmin -u root password '암호'
+
+mysql_secure_installation
+enter - y - y - 암호입력 - 암호입력 - y - y - n - y
+
+------ 옵션
+vi /etc/my.cnf.d/server.cnf
+12 [mysqld]
+13 character-set-server=utf8mb4
+14 collation-server=utf8mb4_unicode_ci
+15 lower_case_table_names=1
+16 character-set-client-handshake = FALSE
+17 port=number
+
+vi /etc/my.cnf.d/mysql-clients.cnf
+6 [mysql]
+7 default-character-set=utf8mb4
+17 [mysqldump]
+18 default-character-set=utf8mb4
+
+/usr/bin/mysql -u root -p 
+*localhost 에서는 암호를 입력하지 않아도 접근이 된다.???
+
+use mysql;
+CREATE DATABASE lamp;
+CREATE USER desk@'%' IDENTIFIED BY 'Cortkd11!!';
+GRANT ALL PRIVILEGES ON lamp.* TO desk@'%';
+FLUSH PRIVILEGES;
+exit;
+
+/usr/bin/mysql -u desk -p
+
+
+--- gcp 보안 설정 오픈
+
+--- workbench 연결
+
+--- 참고
+
+** netstat -tulpn | grep LISTEN
+
+34.64.150.241
+
+
+
+
+

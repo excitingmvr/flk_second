@@ -1,0 +1,317 @@
+
+
+예전에는 amazon aws 를 사용하였는데
+google api 를 사용하다 보니 이번에는 구글을 사용하여 보기로 했습니다.
+
+기본적으로 본 카페의
+"google cloud platform > cloud vision api" 메뉴에 있는
+
+1. google cloud vision api 사용 위한 준비 - 프로젝트 만들기
+https://cafe.naver.com/itplayzone/97
+
+여기까지는 진행이 되어야 합니다.
+
+34.64.250.119
+
+No supported authentication methods available (server sent: publickey,gasspi-keyex,gssapi-with-mic)
+
+----- ssh
+
+# /etc/init.d/sshd start
+
+sshd 서비스 포트변경 
+
+# vi /etc/ssh/sshd_config
+
+[root@instance-20200306 sbin]# service sshd restart
+Redirecting to /bin/systemctl restart sshd.service
+
+
+-------- firewalld 
+
+CentOS7 부터는 방화벽 데몬이 iptables가 없어지고 firewalld 으로 변경
+
+
+/etc/firewalld
+
+설정파일 
+/etc/firewalld/
+
+재시작
+firewall-cmd --reload
+
+기본 존 출력
+[root@instance-20200306 ~]# firewall-cmd --get-default-zone
+trusted
+
+활성화된 존 출력
+[root@instance-20200306 ~]# firewall-cmd --get-active-zone
+trusted
+  interfaces: eth0
+
+---------------- httpd
+[root@instance-20200306 zones]# /usr/sbin/httpd -k stop
+[root@instance-20200306 zones]# ps -ef | grep httpd
+root     21203 17504  0 14:06 pts/0    00:00:00 grep --color=auto 
+httpd
+[root@instance-20200306 zones]# /usr/sbin/httpd -k start
+[root@instance-20200306 zones]# ps -ef | grep httpd
+root     21243     1  0 14:06 ?        00:00:00 /usr/sbin/httpd -k
+ start
+apache   21244 21243  0 14:06 ?        00:00:00 /usr/sbin/httpd -k
+ start
+apache   21245 21243  0 14:06 ?        00:00:00 /usr/sbin/httpd -k
+ start
+apache   21246 21243  0 14:06 ?        00:00:00 /usr/sbin/httpd -k
+ start
+apache   21247 21243  0 14:06 ?        00:00:00 /usr/sbin/httpd -k
+ start
+apache   21248 21243  0 14:06 ?        00:00:00 /usr/sbin/httpd -k
+ start
+root     21254 17504  0 14:06 pts/0    00:00:00 grep --color=auto 
+httpd
+[root@instance-20200306 zones]# 
+
+whoami
+pwd
+cat /etc/redhat-release
+
+sudo passwd
+
+su -
+
+whoami
+pwd
+
+date
+mv /etc/localtime /etc/localtime_org
+ln -s /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+date
+
+
+
+ssh에서 root랑 텍스트 허용
+vi /etc/ssh/sshd_config
+service sshd restart
+
+[root@svr01inst01 ~]# vi /etc/ssh/sshd_config
+[root@svr01inst01 ~]# service sshd restart
+Redirecting to /bin/systemctl restart sshd.service
+[root@svr01inst01 ~]# 
+
+
+
+Connected, host fingerprint: ssh-rsa 0 71:FF:70:75:45:89:06:FD:B5:0A:5E:AD:B7:F9
+:18:6B:8B:82:12:3B:50:AF:0D:7A:F2:F0:6F:FE:00:43:F2:2D
+Last login: Wed Mar 11 01:13:31 2020 from 173.194.93.165
+[excitingmvr@svr01inst01 ~]$ whoami
+excitingmvr
+[excitingmvr@svr01inst01 ~]$ pwd
+/home/excitingmvr
+[excitingmvr@svr01inst01 ~]$ cat /etc/redhat-release
+CentOS Linux release 7.7.1908 (Core)
+[excitingmvr@svr01inst01 ~]$ 
+[excitingmvr@svr01inst01 ~]$ sudo passwd
+Changing password for user root.
+New password: 
+Retype new password: 
+passwd: all authentication tokens updated successfully.
+[excitingmvr@svr01inst01 ~]$ su -
+Password: 
+[root@svr01inst01 ~]# whoami
+root
+[root@svr01inst01 ~]# pwd
+/root
+[root@svr01inst01 ~]# 
+[root@svr01inst01 ~]# date
+Wed Mar 11 01:19:46 UTC 2020
+[root@svr01inst01 ~]# mv /etc/localtime /etc/localtime_org
+[root@svr01inst01 ~]# ln -s /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+[root@svr01inst01 ~]# date
+Wed Mar 11 10:20:03 KST 2020
+[root@svr01inst01 ~]# 
+
+
+---- 패키지 설치 여부 확인
+rpm -qa | grep httpd
+
+yum -y install httpd                      !- 아파치 설치 (y : answer yes for all questions)
+
+# yum remove httpd
+ 
+# systemctl enable httpd.service            !- 부팅시 자동시작
+# systemctl start httpd                     !- 아파치 서버 시작
+
+ps -ef | grep httpd
+
+/usr/sbin/httpd -k start
+
+/usr/sbin/httpd -k stop
+
+실행파일 위치
+/usr/sbin/httpd 
+
+서버 루트
+ServerRoot "/etc/httpd"
+
+도큐먼트 루트
+DocumentRoot "/var/www/html"
+
+루트 디렉토리
+설정파일 위치
+로그파일 위치
+
+apache 최초 인덱스 파일
+/usr/share/httpd/noindex/index.html
+
+php 설치
+yum install epel-release
+rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+yum --enablerepo=remi-php74 install php
+
+vi /etc/httpd/conf/httpd.conf
+
+mkdir /etc/httpd/conf/extra
+
+index.htm index.php
+
+AddType application/x-httpd-php .php .html .htm .inc
+AddType application/x-httpd-php-source .phps
+
+
+34.64.150.241
+
+
+rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+yum install php74-php-gd.x86_64
+
+
+vhost
+
+mkdir -p /factory/workspace_php/girlsday_1_0/htdocs
+
+mkdir /var/log/httpd/girlsday_1_0
+
+mkdir /etc/httpd/conf/extra
+
+vi httpd-vhosts_girlsday_1_0.conf
+
+
+<VirtualHost *:80>
+
+        ServerAdmin     account@yourdomain.com
+        DocumentRoot    /factory/workspace_php/girlsday_1_0/htdocs
+        ServerName      ai.kaionex.com
+
+        ErrorLog        /var/log/httpd/girlsday_1_0/error.log
+        CustomLog       /var/log/httpd/girlsday_1_0/access.log combined
+
+        <Directory /factory/workspace_php/girlsday_1_0/htdocs>
+                Require all granted
+                AllowOverride All
+        </Directory>
+
+</VirtualHost>
+
+
+/etc/httpd/conf/httpd.conf
+
+# virtual host
+Include /etc/httpd/conf/extra/*.conf
+
+virtual index.html
+
+    AllowOverride None
+    Require all granted
+
+
+-- composer
+yum install php-cli php-zip wget unzip
+
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+
+HASH="$(wget -q -O - https://composer.github.io/installer.sig)"
+
+php -r "if (hash_file('SHA384', 'composer-setup.php') === '$HASH') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+
+php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+
+php –r “unlink(‘composer-setup.php’);”
+-> -bash: syntax error near unexpected token `('
+
+
+----- php7.0-bcmath
+
+yum install php74-php-bcmath.x86_64
+
+yum --enablerepo=remi-php74 install php-bcmath
+
+----- mariadb
+
+vi /etc/yum.repos.d/mariadb.repo
+
+[mariadb]
+name = MariaDB
+baseurl = http://yum.mariadb.org/10.4/centos7-amd64
+gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+gpgcheck=1
+
+yum install MariaDB
+
+rpm -qa |grep MariaDB
+
+systemctl start mariadb
+
+ps -ef | grep mysqld
+
+systemctl stop mariadb
+
+ps -ef | grep mysqld
+
+mysql_secure_installation
+
+/usr/bin/mysql -u root -p
+
+------ 옵션
+
+- utf8 -> utf8mb4
+
+vi /etc/my.cnf.d/server.cnf
+[mysqld]
+character-set-server=utf8mb4
+collation-server=utf8mb4_unicode_ci
+lower_case_table_names=1
+character-set-client-handshake = FALSE
+port=number
+
+vi /etc/my.cnf.d/mysql-clients.cnf
+
+[mysql]
+default-character-set=utf8mb4
+[mysqldump]
+default-character-set=utf8mb4
+
+
+CREATE DATABASE lamp;
+CREATE USER desk@'%' IDENTIFIED BY 'Cortkd11!!';
+GRANT ALL PRIVILEGES ON lamp.* TO desk@'%';
+
+FLUSH PRIVILEGES;
+
+privileges
+
+
+db
+
+
+netstat -tulpn | grep LISTEN
+오픈된 포트 연결
+
+
+34.64.150.241
+
+
+
+
+
+

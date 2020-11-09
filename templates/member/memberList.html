@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>member list</title>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/common.js?ver=0.0.1"></script>
+
+  
+</head>
+<body>
+
+    <form id="mainSearchForm" method="GET" action="{{url_for(request.endpoint)}}" accept-charset="utf-8">
+        <input type="hidden" name="pageThis" value="1">
+        <select name="searchOption">
+            <option value="0" {% if dicSchsMain.searchOption == 0 %}selected{% endif %}>::CHOOSE::</option>
+            <!-- #<- -->
+            <option value="ifmbId" {% if dicSchsMain.searchOption == "ifmbId" %}selected{% endif %}>ID</option>
+            <option value="ifmbFirstName" {% if dicSchsMain.searchOption == "ifmbFirstName" %}selected{% endif %}>Name</option>
+        </select>
+        <input type="text" name="searchValue" value="{% if dicSchsMain.searchValue != None: %}{{dicSchsMain.searchValue}}{% endif %}">
+        <button id="mainSearchFormButton" type="button">search</button>
+        <button id="mainSearchFormResetButton" type="button">reset</button>
+    </form>
+    
+    <br><br>
+    {% for rt in rts %}
+        <a href="/member/view?&pageThis={{dicPagsMain.pageThis}}&seq={{rt.ifmbSeq|seqEncode}}{% if dicSchsMain.searchOption != None %}&searchOption={{dicSchsMain.searchOption}}&searchValue={{dicSchsMain.searchValue}}{% endif %}"">{{rt.ifmbSeq}}</a>  . {{rt.ifmbFirstName}}<br>
+    {% endfor %}
+
+
+    <p id="lita"></p>
+
+    <br>rowTotal: {{dicPagsMain.rowTotal}}
+    <br>pageTotal: {{dicPagsMain.pageTotal}}
+    <br>pageThis: {{dicPagsMain.pageThis}}
+    <br>blockTotal: {{dicPagsMain.blockTotal}}
+    <br>blockThis: {{dicPagsMain.blockThis}}
+    <br>pageFirst: {{dicPagsMain.pageFirst}}
+    <br>pageEnd: {{dicPagsMain.pageEnd}}
+    <br>pagePrevious: {{dicPagsMain.pagePrevious}}
+    <br>pageNext: {{dicPagsMain.pageNext}}   
+    <br>pageNum: {{dicPagsMain.pageNum}}
+    <br>
+    <br>
+    {% if dicPagsMain.blockThis < 2 %}
+        <a href="{{url_for(request.endpoint)}}?pageThis=1{% if dicSchsMain.searchOption != None %}&searchOption={{dicSchsMain.searchOption}}&searchValue={{dicSchsMain.searchValue}}{% endif %}">◀</a>
+    {% endif %}
+    {% if dicPagsMain.blockThis < 1 %}
+        <a href="{{url_for(request.endpoint)}}?pageThis=dicPagsMain.pagePrevious{% if dicSchsMain.searchOption != None %}&searchOption={{dicSchsMain.searchOption}}&searchValue={{dicSchsMain.searchValue}}{% endif %}">◁</a>
+    {% endif %}
+    
+    {% for i in range(dicPagsMain.pageFirst,dicPagsMain.pageEnd+1) %}
+        <a href="{{url_for(request.endpoint)}}?pageThis={{i}}{% if dicSchsMain.searchOption != None %}&searchOption={{dicSchsMain.searchOption}}&searchValue={{dicSchsMain.searchValue}}{% endif %}">{{i}}</a>
+    {% endfor %}
+
+    {% if dicPagsMain.blockThis < dicPagsMain.blockTotal %}
+        <a href="{{url_for(request.endpoint)}}?pageThis={{dicPagsMain.pageNext}}{% if dicSchsMain.searchOption != None %}&searchOption={{dicSchsMain.searchOption}}&searchValue={{dicSchsMain.searchValue}}{% endif %}">▷</a>
+    {% endif %}
+    {% if dicPagsMain.blockThis < (dicPagsMain.blockTotal - 1) %}
+        <a href="{{url_for(request.endpoint)}}?pageThis={{dicPagsMain.pageTotal}}{% if dicSchsMain.searchOption != None %}&searchOption={{dicSchsMain.searchOption}}&searchValue={{dicSchsMain.searchValue}}{% endif %}">▶</a>
+    {% endif %}
+
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+       
+            // $.ajax({
+            //         url:'/member/lita',
+            //         type:'post',
+            //         data:{'Id': $("input[name=ifmbId]").val()},
+            //         success: function(rt) {
+
+            //         },
+            //         error: function(err) {
+            //             // pass
+            //         }
+            // });
+
+        });
+
+
+        $("#mainSearchFormButton").on("click", function(){
+
+            if(!checkNullSelect($("select[name=searchOption]").val(),"option ?")) return false;
+            if(!checkNull($.trim($("input[name=searchValue]").val()), "Key word?")) return false;
+            if($.trim($("input[name=searchValue]").val()).length <= 1){
+                alert("more 2 chr!")
+                return false;
+            } 
+            $("#mainSearchForm").submit();
+        });
+
+
+        $("#mainSearchFormResetButton").on("click", function(){
+            location.href = window.location.pathname;
+        });
+
+  </script>
+</body>
+</html>
+<br><a href="/member/form?pageThis={{dicPagsMain.pageThis}}{% if dicSchsMain.searchOption != None %}&searchOption={{dicSchsMain.searchOption}}&searchValue={{dicSchsMain.searchValue}}{% endif %}">등록</a>
