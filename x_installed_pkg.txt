@@ -1,4 +1,1 @@
-pip install flask
-pip install user_agents
-pip install pymysql
-pip install bcrypt
+pip install flask user_agents pymysql bcrypt
