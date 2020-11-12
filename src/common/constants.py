@@ -11,13 +11,19 @@ class Constants():
     #hashing (must 4 char)
     HASH_SUFFIX = 'KoNa'
 
-    PROJECT_PATH_WINDOWS = 'D:/factory/workspace_flask/flk_second'
-    PROJECT_PATH_LINUX = ''
-    PROJECT_PATH_MAC = ''
+    PATH_PROJECT_WINDOWS = 'D:/factory/workspace_flask/flk_second'
+    PATH_PROJECT_LINUX = '/factory/workspace_flask/flk_second'
+    PATH_PROJECT_MAC = '/factory/workspace_flask/flk_second'
 
-    SOURCE_PAHT_WINDOWS = 'D:/factory/workspace_flask/flk_second/src'
-    SOURCE_PAHT_LINUX = ''
-    SOURCE_PAHT_MAC = ''
+    PAHT_SOURCE_WINDOWS = 'D:/factory/workspace_flask/flk_second/src'
+    PAHT_SOURCE_LINUX = '/factory/workspace_flask/flk_second/src'
+    PAHT_SOURCE_MAC = '/factory/workspace_flask/flk_second/src'
     
-    UPLOAD_FOLDER_FULL = 'D:/factory/workspace_flask/flk_second/static/upload'
-    UPLOAD_FOLDER_FOR_LINK = '/static/upload'
+    PATH_UPLOAD_WINDOWS = 'D:/factory/workspace_flask/flk_second/static/upload'
+    PATH_UPLOAD_LINUX = '/factory/workspace_flask/flk_second/static/upload'
+    PATH_UPLOAD_MAC = '/factory/workspace_flask/flk_second/static/upload'
+
+    PATH_UPLOAD_FOR_LINK = '/static/upload'
+
+    # UPLOAD_FOLDER_FULL = 'D:/factory/workspace_flask/flk_second/static/upload'
+    # UPLOAD_FOLDER_FOR_LINK = '/static/upload'

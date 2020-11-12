@@ -1,11 +1,16 @@
 # -- coding: utf-8 --
 
 from flask import Flask, Blueprint
-import sys
+import sys, platform
 
-from src.common.constants import Constants as constantsObj
+from src.common.constants import Constants
+from src.common.util import Util
 
-sys.path.append(constantsObj.SOURCE_PAHT_WINDOWS)
+constantsObj = Constants()
+utilObj = Util()
+
+sys.path.append(utilObj.setPathSource(platform.system()))
+# sys.path.append(constantsObj.SOURCE_PAHT_WINDOWS)
 
 app = Flask(__name__)
 

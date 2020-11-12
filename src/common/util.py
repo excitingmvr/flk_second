@@ -4,6 +4,10 @@ from flask import request
 from user_agents import parse
 import hashlib
 
+from src.common.constants import Constants
+
+constantsObj = Constants()
+
 class Util():
 
     def getDeviceCd(self):
@@ -33,6 +37,32 @@ class Util():
             result = param
         return result
 
+    def setPathProject(self, param):
+        if param == 'Windows':
+            result = constantsObj.PATH_PROJECT_WINDOWS
+        elif param == 'Linux':
+            result = constantsObj.PATH_PROJECT_LINUX
+        else:   # mac (Darwin)
+            result = constantsObj.PATH_PROJECT_MAC
+        return result
+    
+    def setPathSource(self, param):
+        if param == 'Windows':
+            result = constantsObj.PAHT_SOURCE_WINDOWS
+        elif param == 'Linux':
+            result = constantsObj.PAHT_SOURCE_LINUX
+        else:   # mac (Darwin)
+            result = constantsObj.PAHT_SOURCE_MAC
+        return result
+
+    def setPathUpload(self, param):
+        if param == 'Windows':
+            result = constantsObj.PATH_UPLOAD_WINDOWS
+        elif param == 'Linux':
+            result = constantsObj.PATH_UPLOAD_LINUX
+        else:   # mac (Darwin)
+            result = constantsObj.PATH_UPLOAD_MAC
+        return result
 
 
     # def seqEncode(self, rt):

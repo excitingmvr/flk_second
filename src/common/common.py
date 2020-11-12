@@ -2,7 +2,7 @@
 
 from flask import request
 from random import *
-import datetime, os
+import datetime, os, platform
 
 from src.common.constants import Constants
 from src.common.util import Util
@@ -33,8 +33,9 @@ class Common():
         files = request.files.getlist(inputName)
         i = 0
         fileDefaultNy = 1
-        filePathFull = constantsObj.UPLOAD_FOLDER_FULL + "/" + module + "/" + inputName + "/" + str(dt.year) + "/" + str(dt.month) + "/" + str(dt.day) + "/" + str(dt.hour)
-        filePathForLink = constantsObj.UPLOAD_FOLDER_FOR_LINK + "/" + module + "/" + inputName + "/" + str(dt.year) + "/" + str(dt.month) + "/" + str(dt.day) + "/" + str(dt.hour)
+        filePathFull = utilObj.setPathUpload(platform.system()) + "/" + module + "/" + inputName + "/" + str(dt.year) + "/" + str(dt.month) + "/" + str(dt.day) + "/" + str(dt.hour)
+        # filePathFull = constantsObj.UPLOAD_FOLDER_FULL + "/" + module + "/" + inputName + "/" + str(dt.year) + "/" + str(dt.month) + "/" + str(dt.day) + "/" + str(dt.hour)
+        filePathForLink = constantsObj.PATH_UPLOAD_FOR_LINK + "/" + module + "/" + inputName + "/" + str(dt.year) + "/" + str(dt.month) + "/" + str(dt.day) + "/" + str(dt.hour)
         
         if os.path.isdir(filePathFull):
             pass
