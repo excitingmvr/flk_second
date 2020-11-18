@@ -3,7 +3,7 @@
 from flask import Blueprint, render_template, redirect, request
 from werkzeug.utils import secure_filename
 from random import *
-import datetime, math, base64, bcrypt, os
+import datetime, math, base64, os
 
 from src.common.filter import *
 from src.common.constants import Constants
@@ -129,7 +129,7 @@ def moduleInsert():
                         "ifmbFirstName":request.form["ifmbFirstName"],
                         "ifmbLastName":request.form["ifmbLastName"],
                         "ifmbId":request.form["ifmbId"],
-                        "ifmbPassword":bcrypt.hashpw(request.form["ifmbPassword"].encode('utf-8'), bcrypt.gensalt()),
+                        "ifmbPassword":request.form["ifmbPassword"],
                         "ifmbGenderCd":request.form["ifmbGenderCd"],
                         "ifmbDob":datetime.datetime(int(request.form["dobYear"]), 
                                                     int(request.form["dobMonth"]), 
@@ -223,6 +223,8 @@ def setStrSchForPostMain(searchOption, searchValue):
     else:
         strSchsMain = '&searchOption=' + searchOption + '&searchValue=' + searchValue
     return strSchsMain
+
+# "ifmbPassword":bcrypt.hashpw(request.form["ifmbPassword"].encode('utf-8'), bcrypt.gensalt()),
 
 # data = request.form
 # for key in data:
