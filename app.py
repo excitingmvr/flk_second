@@ -10,7 +10,6 @@ constantsObj = Constants()
 utilObj = Util()
 
 sys.path.append(utilObj.setPathSource(platform.system()))
-# sys.path.append(constantsObj.SOURCE_PAHT_WINDOWS)
 
 app = Flask(__name__)
 
