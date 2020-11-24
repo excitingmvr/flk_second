@@ -37,3 +37,11 @@ app.jinja_env.filters['bytesToMega'] = bytesToMega
 app.jinja_env.filters['displayGender'] = displayGender
 app.jinja_env.filters['displayNy'] = displayNy
 app.jinja_env.filters['displayDevice'] = displayDevice
+
+app.jinja_env.filters['getYearInt'] = getYearInt
+app.jinja_env.filters['getMonthInt'] = getMonthInt
+app.jinja_env.filters['getDayInt'] = getDayInt
+
+app.jinja_env.filters['hashPwdUser'] = hashPwdUser
+
+

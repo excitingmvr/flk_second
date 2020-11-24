@@ -1,9 +1,10 @@
 # -- coding: utf-8 --
 
 from flask import Blueprint, render_template, redirect, request
+from flask_restful import Resource, Api
 from werkzeug.utils import secure_filename
 from random import *
-import datetime, math, base64, os
+import datetime, math, base64, os, json
 
 from src.common.filter import *
 from src.common.constants import Constants
@@ -31,7 +32,127 @@ member = Blueprint(module, __name__, url_prefix = "/" + module)
 #<--
 moduleObj = member
 
-####################################################################### 
+moduleApi = Api(moduleObj)
+
+## set vals #################################################
+
+def setDicInsertMain():
+    #<-
+    result = {
+                "ifmbAdminNy":request.form["ifmbAdminNy"],
+                "ifmbFirstName":request.form["ifmbFirstName"],
+                "ifmbLastName":request.form["ifmbLastName"],
+                "ifmbId":request.form["ifmbId"],
+                "ifmbPassword":hashPwdUser(request.form["ifmbPassword"],1),
+                "ifmbGenderCd":request.form["ifmbGenderCd"],
+                "ifmbDob":datetime.datetime(int(request.form["dobYear"]), 
+                                            int(request.form["dobMonth"]), 
+                                            int(request.form["dobDay"])),
+                "ifmbEmailAuthNy":request.form["ifmbEmailAuthNy"],
+                "ifmbNickName":request.form["ifmbNickName"],
+                "ifmbDormantNy":0,
+                "ifmbIntroduction":request.form["ifmbIntroduction"],
+                "ifmbRegIp":request.environ["REMOTE_ADDR"],
+                "ifmbRegSeq":0,
+                "ifmbRegOffset":0,
+                "ifmbRegDatetime":datetime.datetime.today(),
+                "ifmbRegDeviceCd":utilObj.getDeviceCd(),                         
+                "ifmbModIp":request.environ["REMOTE_ADDR"],
+                "ifmbModSeq":0,
+                "ifmbModOffset":0,
+                "ifmbModDatetime":datetime.datetime.today(),
+                "ifmbModDeviceCd":utilObj.getDeviceCd(),
+                "ifmbSys":constantsObj.SYS_NUMBER,
+                "ifmbDelNy":0                
+            }
+    return result
+
+def setDicUpdateMain(param):
+    if param == 'json':
+        tmpDic = request.json
+    else:       # from form
+        tmpDic = request.form
+    #<-
+    result = {
+                "ifmbAdminNy":tmpDic["ifmbAdminNy"],
+                "ifmbFirstName":tmpDic["ifmbFirstName"],
+                "ifmbLastName":tmpDic["ifmbLastName"],
+                "ifmbId":tmpDic["ifmbId"],
+                "ifmbGenderCd":tmpDic["ifmbGenderCd"],
+                "ifmbDob":datetime.datetime(int(tmpDic["dobYear"]), 
+                                            int(tmpDic["dobMonth"]), 
+                                            int(tmpDic["dobDay"])),
+                "ifmbEmailAuthNy":tmpDic["ifmbEmailAuthNy"],
+                "ifmbNickName":tmpDic["ifmbNickName"],
+                "ifmbDormantNy":0,
+                "ifmbIntroduction":tmpDic["ifmbIntroduction"],
+                "ifmbModIp":request.environ["REMOTE_ADDR"],
+                "ifmbModSeq":1,
+                "ifmbModOffset":1,
+                "ifmbModDatetime":datetime.datetime.today(),
+                "ifmbModDeviceCd":utilObj.getDeviceCd(),
+                "ifmbSeq":seqDecode(tmpDic["ifmbSeq"])
+            }
+    print(result)
+    return result
+
+## REST #################################################
+
+# def abort_if_todo_doesnt_exist(todo_id):
+#     if todo_id not in TODOS:
+#         abort(404, message="Todo {} doesn't exist".format(todo_id))
+def json_default(value):
+    if isinstance(value, datetime.date): 
+        return value.strftime('%Y-%m-%d') 
+    raise TypeError('not JSON serializable')
+
+
+class ModuleRestListClass(Resource):
+    def get(self):
+        rows = moduleSqlObj.getRows(limitStart=1, dicSchsMain={"searchOption":None, "searchValue":None})
+        for row in rows:
+            row["ifmbDob"] = row["ifmbDob"].strftime('%Y-%m-%d')
+            row["ifmbRegDatetime"] = row["ifmbRegDatetime"].strftime('%Y-%m-%d %H:%M:%S')
+            row["ifmbModDatetime"] = row["ifmbModDatetime"].strftime('%Y-%m-%d %H:%M:%S')
+        return rows
+
+    def post(self):
+        # args = parser.parse_args()
+        # todo_id = int(max(TODOS.keys()).lstrip('todo')) + 1
+        # todo_id = 'todo%i' % todo_id
+        # TODOS[todo_id] = {'task': args['task']}
+        # return TODOS[todo_id], 201
+        return {'status': 'success'}
+
+class ModuleRestClass(Resource):
+    def get(self, seq):
+        row = moduleSqlObj.getRow(seq)
+        row["ifmbDob"] = row["ifmbDob"].strftime('%Y-%m-%d')
+        row["ifmbRegDatetime"] = row["ifmbRegDatetime"].strftime('%Y-%m-%d %H:%M:%S')
+        row["ifmbModDatetime"] = row["ifmbModDatetime"].strftime('%Y-%m-%d %H:%M:%S')
+        return row
+
+    def delete(self, seq):
+        # abort_if_todo_doesnt_exist(todo_id)
+        # del TODOS[todo_id]
+        # return '', 204
+        return {'status': 'success'}
+
+    # update
+    def put(self, seq):
+        dicUpdateMain = setDicUpdateMain('json')
+        moduleSqlObj.update((dicUpdateMain))
+        # args = parser.parse_args()
+        # task = {'task': args['task']}
+        # TODOS[todo_id] = task
+        # return task, 201
+        return {'status': 'success'}
+
+moduleApi.add_resource(ModuleRestListClass, '/')
+moduleApi.add_resource(ModuleRestClass, '/<seq>')
+
+
+## web #######################################################
 
 @moduleObj.route("/list", methods=["GET"])
 def moduleList():
@@ -40,8 +161,6 @@ def moduleList():
         dicSchsMain = {"searchOption":request.args.get("searchOption"), "searchValue":request.args.get("searchValue")}
     else:
         dicSchsMain = {"searchOption":None, "searchValue":None}
-
-    print(dicSchsMain)
 
     pageThis = request.args.get("pageThis") if request.args.get("pageThis") else 1
     pageThis = int(pageThis)
@@ -123,34 +242,7 @@ def moduleForm():
 @moduleObj.route("/insert", methods=['POST'])
 def moduleInsert():
     strSchMain = setStrSchForPostMain(request.form['searchOption'], request.form['searchValue'])
-    #<-
-    dicInsertMain = {
-                        "ifmbAdminNy":request.form["ifmbAdminNy"],
-                        "ifmbFirstName":request.form["ifmbFirstName"],
-                        "ifmbLastName":request.form["ifmbLastName"],
-                        "ifmbId":request.form["ifmbId"],
-                        "ifmbPassword":request.form["ifmbPassword"],
-                        "ifmbGenderCd":request.form["ifmbGenderCd"],
-                        "ifmbDob":datetime.datetime(int(request.form["dobYear"]), 
-                                                    int(request.form["dobMonth"]), 
-                                                    int(request.form["dobDay"])),
-                        "ifmbEmailAuthNy":request.form["ifmbEmailAuthNy"],
-                        "ifmbNickName":request.form["ifmbNickName"],
-                        "ifmbDormantNy":0,
-                        "ifmbIntroduction":request.form["ifmbIntroduction"],
-                        "ifmbRegIp":request.environ["REMOTE_ADDR"],
-                        "ifmbRegSeq":0,
-                        "ifmbRegOffset":0,
-                        "ifmbRegDatetime":datetime.datetime.today(),
-                        "ifmbRegDeviceCd":utilObj.getDeviceCd(),                         
-                        "ifmbModIp":request.environ["REMOTE_ADDR"],
-                        "ifmbModSeq":0,
-                        "ifmbModOffset":0,
-                        "ifmbModDatetime":datetime.datetime.today(),
-                        "ifmbModDeviceCd":utilObj.getDeviceCd(),
-                        "ifmbSys":constantsObj.SYS_NUMBER,
-                        "ifmbDelNy":0                
-                    }
+    dicInsertMain = setDicInsertMain()
     lastrowid = moduleSqlObj.insert((dicInsertMain))
     # #<- if attached files existed
     commonObj.uploadFile("file1", module, lastrowid, "infrmember")
@@ -162,31 +254,9 @@ def moduleInsert():
 @moduleObj.route("/update", methods=['POST'])
 def moduleUpdate():
     strSchMain = setStrSchForPostMain(request.form['searchOption'], request.form['searchValue'])
-    #<-
-    dicUpdateMain = {
-                        "ifmbAdminNy":request.form["ifmbAdminNy"],
-                        "ifmbFirstName":request.form["ifmbFirstName"],
-                        "ifmbLastName":request.form["ifmbLastName"],
-                        "ifmbId":request.form["ifmbId"],
-                        "ifmbPassword":request.form["ifmbPassword"],
-                        "ifmbGenderCd":request.form["ifmbGenderCd"],
-                        "ifmbDob":datetime.datetime(int(request.form["dobYear"]), 
-                                                    int(request.form["dobMonth"]), 
-                                                    int(request.form["dobDay"])),
-                        "ifmbEmailAuthNy":request.form["ifmbEmailAuthNy"],
-                        "ifmbNickName":request.form["ifmbNickName"],
-                        "ifmbDormantNy":0,
-                        "ifmbIntroduction":request.form["ifmbIntroduction"],
-                        "ifmbModIp":request.environ["REMOTE_ADDR"],
-                        "ifmbModSeq":1,
-                        "ifmbModOffset":1,
-                        "ifmbModDatetime":datetime.datetime.today(),
-                        "ifmbModDeviceCd":utilObj.getDeviceCd(),
-                        "ifmbSeq":seqDecode(request.form["ifmbSeq"])
-    }
+    dicUpdateMain = setDicUpdateMain('web')
     moduleSqlObj.update((dicUpdateMain))
     return redirect(commonObj.moduleViewUrl + "?pageThis=" + request.form["pageThis"] + "&seq=" + request.form["seq"] + strSchMain)
-
 
 @moduleObj.route("/uelete", methods=['GET'])
 def moduleUelete():

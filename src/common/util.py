@@ -27,6 +27,12 @@ class Util():
             pass
         if userAgent.is_tablet:
             result = 3
+        else:
+            pass
+        if userAgent.is_pc == False and userAgent.is_mobile == False and userAgent.is_tablet == False:
+            result = 4
+        else:
+            pass
 
         return result
     

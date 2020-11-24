@@ -1,9 +1,9 @@
 // includeJs("./util.js")
 // includeJs("./validation.js")
 
-document.write("<script type='text/javascript' src='/static/js/constants.js?ver=0.0.8'></script>");
-document.write("<script type='text/javascript' src='/static/js/util.js?ver=0.0.8'></script>");
-document.write("<script type='text/javascript' src='/static/js/validation.js?ver=0.0.8'></script>"); 
+document.write("<script type='text/javascript' src='/static/js/constants.js?ver=0.0.1'></script>");
+document.write("<script type='text/javascript' src='/static/js/util.js?ver=0.0.1'></script>");
+document.write("<script type='text/javascript' src='/static/js/validation.js?ver=0.0.1'></script>"); 
 
 // inputName = "";
 

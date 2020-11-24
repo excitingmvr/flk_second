@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>memberForm</title>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script type="text/javascript" src="/static/js/common.js?ver=0.0.8"></script>
+    <script type="text/javascript" src="/static/js/common.js?ver=0.0.1"></script>
 </head>
 <body>
     {% if rt.ifmbSeq %}
@@ -47,19 +47,19 @@
             <select name="dobYear">
                 <option value="0">::Year::</option>
                 {% for i in range(1940,2020) %}
-                <option value="{{i}}" {% if rt.ifmbDob %} {% if rt.ifmbDob.strftime('%Y') == i %} selected {% endif %} {% endif %}>{{i}}</option>
+                <option value="{{i}}" {% if rt.ifmbDob %} {% if rt.ifmbDob|getYearInt == i %} selected {% endif %} {% endif %}>{{i}}</option>
                 {% endfor %}                 
             </select>  
             <select name="dobMonth">
                 <option value="0">::Month::</option>
                 {% for i in range(1,13) %}
-                <option value="{{i}}" {% if rt.ifmbDob %} {% if rt.ifmbDob.strftime('%m') == i %} selected {% endif %} {% endif %}>{{i}}</option>
+                <option value="{{i}}" {% if rt.ifmbDob %} {% if rt.ifmbDob|getMonthInt == i %} selected {% endif %} {% endif %}>{{i}}</option>
                 {% endfor %}                 
             </select>  
             <select name="dobDay">
                 <option value="0">::Day::</option>
                 {% for i in range(1,32) %}
-                <option value="{{i}}" {% if rt.ifmbDob %} {% if rt.ifmbDob.strftime('%d') == i %} selected {% endif %} {% endif %}>{{i}}</option>
+                <option value="{{i}}" {% if rt.ifmbDob %} {% if rt.ifmbDob|getDayInt == i %} selected {% endif %} {% endif %}>{{i}}</option>
                 {% endfor %}                 
             </select>
         <br>agree to get email:
@@ -135,16 +135,16 @@
                 alert("4~20,0-9a-zA-Z._-");
                 return false;
             }
-            if(!checkNull($.trim($("input[name=ifmbPassword]").val()), "Password")) return false;
-            if(!checkPassword($.trim($("input[name=ifmbPassword]").val()))){
-                alert("8~20,0-9a-zA-Z!@#$%^&*");
-                return false;
-            }
-            if(!checkNull($.trim($("input[name=ifmbPasswordRe]").val()), "PasswordRe")) return false;
-            if($.trim($("input[name=ifmbPassword]").val()) != $.trim($("input[name=ifmbPasswordRe]").val())){
-                alert("mismatched Password");
-                return false;
-            }          
+            // if(!checkNull($.trim($("input[name=ifmbPassword]").val()), "Password")) return false;
+            // if(!checkPassword($.trim($("input[name=ifmbPassword]").val()))){
+            //     alert("8~20,0-9a-zA-Z!@#$%^&*");
+            //     return false;
+            // }
+            // if(!checkNull($.trim($("input[name=ifmbPasswordRe]").val()), "PasswordRe")) return false;
+            // if($.trim($("input[name=ifmbPassword]").val()) != $.trim($("input[name=ifmbPasswordRe]").val())){
+            //     alert("mismatched Password");
+            //     return false;
+            // }          
             if(!checkNullSelect($("select[name=ifmbGenderCd]").val(),"Gender")) return false;
             if(!checkDob($("select[name=dobYear]").val(), $("select[name=dobMonth]").val(), $("select[name=dobDay]").val(),"choose all")) return false;
             return true;

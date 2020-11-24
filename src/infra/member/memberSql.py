@@ -164,7 +164,6 @@ class MemberSql():
                             ifmbFirstName = %s,
                             ifmbLastName = %s,
                             ifmbId = %s,
-                            ifmbPassword = %s,
                             ifmbGenderCd = %s,
                             ifmbDob = %s,
                             ifmbEmailAuthNy = %s,
@@ -184,7 +183,6 @@ class MemberSql():
                                         dicUpdateMain["ifmbFirstName"],
                                         dicUpdateMain["ifmbLastName"],
                                         dicUpdateMain["ifmbId"],
-                                        dicUpdateMain["ifmbPassword"],
                                         dicUpdateMain["ifmbGenderCd"],
                                         dicUpdateMain["ifmbDob"],
                                         dicUpdateMain["ifmbEmailAuthNy"],
@@ -201,11 +199,14 @@ class MemberSql():
         databaseObj.commit()
 
 
+## old #################################################################
 
-        # for key, val in dicInsertFile.items():
-        #     print("key = {key}, value={value}".format(key=key,value=val))
+    # for key, val in dicInsertFile.items():
+    #     print("key = {key}, value={value}".format(key=key,value=val))
 
-        # print(sqlInsertFile)
+    # print(sqlInsertFile)
+
+
     # getOne1 = """
     #             SELECT *
     #             FROM 
