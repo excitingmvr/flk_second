@@ -16,6 +16,8 @@
     {% endif %}
     <input type="hidden" name="pageThis" value="{{request.args.get('pageThis')}}">
     <input type="hidden" name="seq" value="{{request.args.get('seq')}}">
+    <input type="hidden" name="datetimeClient" value="">
+    <input type="hidden" name="offsetClient" value="">
     <input type="hidden" name="searchOption" value="{{request.args.get('searchOption')}}">
     <input type="hidden" name="searchValue" value="{{request.args.get('searchValue')}}">
         seq: 
@@ -119,6 +121,12 @@
     <br><a href="/member/list?pageThis={{request.args.get('pageThis')}}{% if request.args.get('searchOption') != None %}&searchOption={{request.args.get('searchOption')}}&searchValue={{request.args.get('searchValue')}}{% endif %}">list</a>
     <script type="text/javascript">
         $(document).ready(function(){
+            datetimeClient = datetimeClient();
+            offsetClient = offsetClient();
+
+            $('input[name="offsetClient"]:hidden').val(offsetClient);
+            $('input[name="datetimeClient"]:hidden').val(datetimeClient);
+
             $("#commentId").hide();
             $("#commentPassword").hide();
             $("#commentPasswordRe").hide();

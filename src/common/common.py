@@ -27,7 +27,7 @@ class Common():
         self.moduleFormHtml = "/" + module + "/" + module + "Form.html"
         self.moduleViewHtml = "/" + module + "/" + module + "View.html"
 
-    def uploadFile(self, inputName, module, lastrowid, tablePrefix):
+    def uploadFile(self, inputName, module, lastrowid, tablePrefix, offsetClient, datetimeClient):
         inputName = inputName
         fileKindCd = inputName[-1:]
         files = request.files.getlist(inputName)
@@ -65,13 +65,13 @@ class Common():
                                     "deftFileOrder":i,
                                     "deftRegIp":request.environ["REMOTE_ADDR"],
                                     "deftRegSeq":0,
-                                    "deftRegOffset":0,
-                                    "deftRegDatetime":datetime.datetime.today(),
+                                    "deftRegOffset":offsetClient,
+                                    "deftRegDatetime":datetimeClient,
                                     "deftRegDeviceCd":utilObj.getDeviceCd(),                         
                                     "deftModIp":request.environ["REMOTE_ADDR"],
                                     "deftModSeq":0,
-                                    "deftModOffset":0,
-                                    "deftModDatetime":datetime.datetime.today(),
+                                    "deftModOffset":offsetClient,
+                                    "deftModDatetime":datetimeClient,
                                     "deftModDeviceCd":utilObj.getDeviceCd(),
                                     "deftSys":constantsObj.SYS_NUMBER,
                                     "deftDelNy":0,

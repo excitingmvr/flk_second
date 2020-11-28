@@ -121,3 +121,27 @@ addComma = function(str) {
 bytesToMega = function(num) {
     return (num / 1048576).toFixed(2);
 }
+
+
+datetimeClient = function() {
+    var datetime = new Date();
+    var year = datetime.getFullYear();
+    var month = '' + (datetime.getMonth() + 1);
+    var date = '' + datetime.getDate();
+    var hour = '' + datetime.getHours();
+    var minute = '' + datetime.getMinutes()
+    var second = '' + datetime.getHours();
+
+    if(month.length < 2) month = '0' + month;
+    if(date.length < 2) date = '0' + date;
+    if(hour.length < 2) hour = '0' + hour;
+    if(minute.length < 2) minute = '0' + minute;
+    if(second.length < 2) second = '0' + second;
+
+    return year+"-"+month+"-"+date+" "+hour+":"+minute+":"+second;
+}
+
+
+offsetClient = function() {
+    return -(new Date().getTimezoneOffset() / 60);
+}

@@ -36,34 +36,38 @@ moduleApi = Api(moduleObj)
 
 ## set vals #################################################
 
-def setDicInsertMain():
+def setDicInsertMain(param):
+    if param == 'json':
+        tmpDic = request.json
+    else:       # from form
+        tmpDic = request.form
     #<-
     result = {
-                "ifmbAdminNy":request.form["ifmbAdminNy"],
-                "ifmbFirstName":request.form["ifmbFirstName"],
-                "ifmbLastName":request.form["ifmbLastName"],
-                "ifmbId":request.form["ifmbId"],
-                "ifmbPassword":hashPwdUser(request.form["ifmbPassword"],1),
-                "ifmbGenderCd":request.form["ifmbGenderCd"],
-                "ifmbDob":datetime.datetime(int(request.form["dobYear"]), 
-                                            int(request.form["dobMonth"]), 
-                                            int(request.form["dobDay"])),
-                "ifmbEmailAuthNy":request.form["ifmbEmailAuthNy"],
-                "ifmbNickName":request.form["ifmbNickName"],
+                "ifmbAdminNy":tmpDic["ifmbAdminNy"],
+                "ifmbFirstName":tmpDic["ifmbFirstName"],
+                "ifmbLastName":tmpDic["ifmbLastName"],
+                "ifmbId":tmpDic["ifmbId"],
+                "ifmbPassword":hashPwdUser(tmpDic["ifmbPassword"],1),
+                "ifmbGenderCd":tmpDic["ifmbGenderCd"],
+                "ifmbDob":datetime.datetime(int(tmpDic["dobYear"]), 
+                                            int(tmpDic["dobMonth"]), 
+                                            int(tmpDic["dobDay"])),
+                "ifmbEmailAuthNy":tmpDic["ifmbEmailAuthNy"],
+                "ifmbNickName":tmpDic["ifmbNickName"],
                 "ifmbDormantNy":0,
-                "ifmbIntroduction":request.form["ifmbIntroduction"],
+                "ifmbIntroduction":tmpDic["ifmbIntroduction"],
                 "ifmbRegIp":request.environ["REMOTE_ADDR"],
                 "ifmbRegSeq":0,
-                "ifmbRegOffset":0,
-                "ifmbRegDatetime":datetime.datetime.today(),
+                "ifmbRegOffset":tmpDic["offsetClient"],
+                "ifmbRegDatetime":tmpDic["datetimeClient"],
                 "ifmbRegDeviceCd":utilObj.getDeviceCd(),                         
                 "ifmbModIp":request.environ["REMOTE_ADDR"],
                 "ifmbModSeq":0,
-                "ifmbModOffset":0,
-                "ifmbModDatetime":datetime.datetime.today(),
+                "ifmbModOffset":tmpDic["offsetClient"],
+                "ifmbModDatetime":tmpDic["datetimeClient"],
                 "ifmbModDeviceCd":utilObj.getDeviceCd(),
                 "ifmbSys":constantsObj.SYS_NUMBER,
-                "ifmbDelNy":0                
+                "ifmbDelNy":0                              
             }
     return result
 
@@ -88,26 +92,17 @@ def setDicUpdateMain(param):
                 "ifmbIntroduction":tmpDic["ifmbIntroduction"],
                 "ifmbModIp":request.environ["REMOTE_ADDR"],
                 "ifmbModSeq":1,
-                "ifmbModOffset":1,
-                "ifmbModDatetime":datetime.datetime.today(),
+                "ifmbModOffset":tmpDic["offsetClient"],
+                "ifmbModDatetime":tmpDic["datetimeClient"],
                 "ifmbModDeviceCd":utilObj.getDeviceCd(),
                 "ifmbSeq":seqDecode(tmpDic["ifmbSeq"])
             }
-    print(result)
     return result
 
-## REST #################################################
+## REST Default #################################################
 
-# def abort_if_todo_doesnt_exist(todo_id):
-#     if todo_id not in TODOS:
-#         abort(404, message="Todo {} doesn't exist".format(todo_id))
-def json_default(value):
-    if isinstance(value, datetime.date): 
-        return value.strftime('%Y-%m-%d') 
-    raise TypeError('not JSON serializable')
-
-
-class ModuleRestListClass(Resource):
+class RestApiWithoutSeq(Resource):
+    # list
     def get(self):
         rows = moduleSqlObj.getRows(limitStart=1, dicSchsMain={"searchOption":None, "searchValue":None})
         for row in rows:
@@ -116,15 +111,14 @@ class ModuleRestListClass(Resource):
             row["ifmbModDatetime"] = row["ifmbModDatetime"].strftime('%Y-%m-%d %H:%M:%S')
         return rows
 
+    # register
     def post(self):
-        # args = parser.parse_args()
-        # todo_id = int(max(TODOS.keys()).lstrip('todo')) + 1
-        # todo_id = 'todo%i' % todo_id
-        # TODOS[todo_id] = {'task': args['task']}
-        # return TODOS[todo_id], 201
-        return {'status': 'success'}
+        dicInsertMain = setDicInsertMain('json')
+        return {'seq': moduleSqlObj.insert((dicInsertMain))}
 
-class ModuleRestClass(Resource):
+
+class RestApiWithSeq(Resource):
+    # get one
     def get(self, seq):
         row = moduleSqlObj.getRow(seq)
         row["ifmbDob"] = row["ifmbDob"].strftime('%Y-%m-%d')
@@ -132,25 +126,32 @@ class ModuleRestClass(Resource):
         row["ifmbModDatetime"] = row["ifmbModDatetime"].strftime('%Y-%m-%d %H:%M:%S')
         return row
 
+    # delete
     def delete(self, seq):
-        # abort_if_todo_doesnt_exist(todo_id)
-        # del TODOS[todo_id]
-        # return '', 204
+        moduleSqlObj.delete(seqDecode(seq))
         return {'status': 'success'}
 
     # update
     def put(self, seq):
         dicUpdateMain = setDicUpdateMain('json')
         moduleSqlObj.update((dicUpdateMain))
-        # args = parser.parse_args()
-        # task = {'task': args['task']}
-        # TODOS[todo_id] = task
-        # return task, 201
-        return {'status': 'success'}
+        return {'seq': seq}
 
-moduleApi.add_resource(ModuleRestListClass, '/')
-moduleApi.add_resource(ModuleRestClass, '/<seq>')
+moduleApi.add_resource(RestApiWithoutSeq, '/')
+moduleApi.add_resource(RestApiWithSeq, '/<seq>')
 
+## REST Another #################################################
+
+@moduleObj.route('/uelete/<seq>', methods=['PUT'])
+# uelete : change delNy value 1 -> 0
+def uelete(seq):
+    moduleSqlObj.uelete(seqDecode(seq))
+    return {'seq': seq}
+
+@moduleObj.route('/checkId/<userId>', methods=['GET'])
+# find user
+def checkId(userId):
+    return {'result': moduleSqlObj.getRowCount(userId)}
 
 ## web #######################################################
 
@@ -242,11 +243,11 @@ def moduleForm():
 @moduleObj.route("/insert", methods=['POST'])
 def moduleInsert():
     strSchMain = setStrSchForPostMain(request.form['searchOption'], request.form['searchValue'])
-    dicInsertMain = setDicInsertMain()
+    dicInsertMain = setDicInsertMain('web')
     lastrowid = moduleSqlObj.insert((dicInsertMain))
     # #<- if attached files existed
-    commonObj.uploadFile("file1", module, lastrowid, "infrmember")
-    commonObj.uploadFile("file2", module, lastrowid, "infrmember")
+    commonObj.uploadFile("file1", module, lastrowid, "infrmember", request.form["offsetClient"], request.form["datetimeClient"])
+    commonObj.uploadFile("file2", module, lastrowid, "infrmember", request.form["offsetClient"], request.form["datetimeClient"])
     #<- if attached files existed end
     return redirect(commonObj.moduleViewUrl + "?pageThis=" + request.form["pageThis"] + "&seq=" + seqEncode(lastrowid) + strSchMain)
 
@@ -274,13 +275,12 @@ def moduleDelete():
 
 @moduleObj.route("/ajxCheckId", methods=['POST'])
 def ajxCheckId():
-    return str(moduleSqlObj.getRowCount(request.form['Id'])['rowCount'])
+    return str(moduleSqlObj.getRowCount(request.form['Id']))
     
 
 ## utils ########################################
 
 def setStrSchForGetMain():
-    
     if request.args.get("searchOption") == 'None' or request.args.get("searchOption") == None:
         strSchsMain = ''
     else:
@@ -293,6 +293,10 @@ def setStrSchForPostMain(searchOption, searchValue):
     else:
         strSchsMain = '&searchOption=' + searchOption + '&searchValue=' + searchValue
     return strSchsMain
+
+
+## old ###################################################################
+
 
 # "ifmbPassword":bcrypt.hashpw(request.form["ifmbPassword"].encode('utf-8'), bcrypt.gensalt()),
 
@@ -355,78 +359,109 @@ def setStrSchForPostMain(searchOption, searchValue):
 #     response.headers['Cache-Control'] = 'public, max-age=0'
 #     return response
 
-    # databaseObj.execute(moduleSqlObj.update,(
-    #                                         request.form["ifmbAdminNy"],
-    #                                         request.form["ifmbFirstName"],
-    #                                         request.form["ifmbLastName"],
-    #                                         request.form["ifmbId"],
-    #                                         request.form["ifmbPassword"],
-    #                                         request.form["ifmbGenderCd"],
-    #                                         datetime.datetime(int(request.form["dobYear"]), 
-    #                                                             int(request.form["dobMonth"]), 
-    #                                                             int(request.form["dobDay"])),
-    #                                         request.form["ifmbEmailAuthNy"],
-    #                                         request.form["ifmbNickName"],
-    #                                         0,
-    #                                         request.environ["REMOTE_ADDR"],
-    #                                         1,
-    #                                         1,
-    #                                         datetime.datetime.today(),
-    #                                         utilObj.getDeviceCd(),
-    #                                         request.form["ifmbSeq"]
-    #                                         ))
+# databaseObj.execute(moduleSqlObj.update,(
+#                                         request.form["ifmbAdminNy"],
+#                                         request.form["ifmbFirstName"],
+#                                         request.form["ifmbLastName"],
+#                                         request.form["ifmbId"],
+#                                         request.form["ifmbPassword"],
+#                                         request.form["ifmbGenderCd"],
+#                                         datetime.datetime(int(request.form["dobYear"]), 
+#                                                             int(request.form["dobMonth"]), 
+#                                                             int(request.form["dobDay"])),
+#                                         request.form["ifmbEmailAuthNy"],
+#                                         request.form["ifmbNickName"],
+#                                         0,
+#                                         request.environ["REMOTE_ADDR"],
+#                                         1,
+#                                         1,
+#                                         datetime.datetime.today(),
+#                                         utilObj.getDeviceCd(),
+#                                         request.form["ifmbSeq"]
+#                                         ))
 
-        # return render_template(commonObj.moduleListHtml,
-    #                         results=rows,
-    #                         rowTotal = rowTotal["rowTotal"], 
-    #                         pageTotal = pageTotal,
-    #                         pageThis=pageThis,
-    #                         blockTotal = blockTotal,
-    #                         blockThis = blockThis,
-    #                         pageFirst = pageFirst,
-    #                         pageEnd = pageEnd,
-    #                         pagePrevious = pagePrevious,
-    #                         pageNext = pageNext,
-    #                         pageNum = constantsObj.pageNum
-    #                         )
+    # return render_template(commonObj.moduleListHtml,
+#                         results=rows,
+#                         rowTotal = rowTotal["rowTotal"], 
+#                         pageTotal = pageTotal,
+#                         pageThis=pageThis,
+#                         blockTotal = blockTotal,
+#                         blockThis = blockThis,
+#                         pageFirst = pageFirst,
+#                         pageEnd = pageEnd,
+#                         pagePrevious = pagePrevious,
+#                         pageNext = pageNext,
+#                         pageNum = constantsObj.pageNum
+#                         )
 
-    # databaseObj.execute(moduleSqlObj.insert,(
-    #                                     request.form["ifmbAdminNy"],
-    #                                     request.form["ifmbFirstName"],
-    #                                     request.form["ifmbLastName"],
-    #                                     request.form["ifmbId"],
-    #                                     request.form["ifmbPassword"],
-    #                                     request.form["ifmbGenderCd"],
-    #                                     datetime.datetime(int(request.form["dobYear"]), 
-    #                                                         int(request.form["dobMonth"]), 
-    #                                                         int(request.form["dobDay"])),
-    #                                     request.form["ifmbEmailAuthNy"],
-    #                                     request.form["ifmbNickName"],
-    #                                     0,
-    #                                     request.environ["REMOTE_ADDR"],
-    #                                     1,
-    #                                     1,
-    #                                     datetime.datetime.today(),
-    #                                     utilObj.getDeviceCd(),
-    #                                     request.environ["REMOTE_ADDR"],
-    #                                     1,
-    #                                     1,
-    #                                     datetime.datetime.today(),
-    #                                     utilObj.getDeviceCd(),
-    #                                     constantsObj.SYS_NUMBER,
-    #                                     0
-    #                                 )) 
+# databaseObj.execute(moduleSqlObj.insert,(
+#                                     request.form["ifmbAdminNy"],
+#                                     request.form["ifmbFirstName"],
+#                                     request.form["ifmbLastName"],
+#                                     request.form["ifmbId"],
+#                                     request.form["ifmbPassword"],
+#                                     request.form["ifmbGenderCd"],
+#                                     datetime.datetime(int(request.form["dobYear"]), 
+#                                                         int(request.form["dobMonth"]), 
+#                                                         int(request.form["dobDay"])),
+#                                     request.form["ifmbEmailAuthNy"],
+#                                     request.form["ifmbNickName"],
+#                                     0,
+#                                     request.environ["REMOTE_ADDR"],
+#                                     1,
+#                                     1,
+#                                     datetime.datetime.today(),
+#                                     utilObj.getDeviceCd(),
+#                                     request.environ["REMOTE_ADDR"],
+#                                     1,
+#                                     1,
+#                                     datetime.datetime.today(),
+#                                     utilObj.getDeviceCd(),
+#                                     constantsObj.SYS_NUMBER,
+#                                     0
+#                                 )) 
 
 
-    # password = 'pass1234'  #2
-    # b = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())   #3 
-    # print(b)
+# password = 'pass1234'  #2
+# b = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())   #3 
+# print(b)
 
-    # c = 'password1234'
-    # print(bcrypt.checkpw(c.encode('utf-8'), b))
+# c = 'password1234'
+# print(bcrypt.checkpw(c.encode('utf-8'), b))
 
-    # d = 'password123'
-    # print(bcrypt.checkpw(d.encode('utf-8'), b))
+# d = 'password123'
+# print(bcrypt.checkpw(d.encode('utf-8'), b))
 
-    # e = 'pass1234'
-    # print(bcrypt.checkpw(e.encode('utf-8'), b))
+# e = 'pass1234'
+# print(bcrypt.checkpw(e.encode('utf-8'), b))
+
+
+# "ifmbAdminNy":request.form["ifmbAdminNy"],
+# "ifmbFirstName":request.form["ifmbFirstName"],
+# "ifmbLastName":request.form["ifmbLastName"],
+# "ifmbId":request.form["ifmbId"],
+# "ifmbPassword":hashPwdUser(request.form["ifmbPassword"],1),
+# "ifmbGenderCd":request.form["ifmbGenderCd"],
+# "ifmbDob":datetime.datetime(int(request.form["dobYear"]), 
+#                             int(request.form["dobMonth"]), 
+#                             int(request.form["dobDay"])),
+# "ifmbEmailAuthNy":request.form["ifmbEmailAuthNy"],
+# "ifmbNickName":request.form["ifmbNickName"],
+# "ifmbDormantNy":0,
+# "ifmbIntroduction":request.form["ifmbIntroduction"],
+# "ifmbRegIp":request.environ["REMOTE_ADDR"],
+# "ifmbRegSeq":0,
+# "ifmbRegOffset":0,
+# "ifmbRegDatetime":datetime.datetime.today(),
+# "ifmbRegDeviceCd":utilObj.getDeviceCd(),                         
+# "ifmbModIp":request.environ["REMOTE_ADDR"],
+# "ifmbModSeq":0,
+# "ifmbModOffset":0,
+# "ifmbModDatetime":datetime.datetime.today(),
+# "ifmbModDeviceCd":utilObj.getDeviceCd(),
+# "ifmbSys":constantsObj.SYS_NUMBER,
+# "ifmbDelNy":0  
+
+# @moduleObj.route("/ajxCheckId", methods=['POST'])
+# def ajxCheckId():
+#     return str(moduleSqlObj.getRowCount(request.form['Id'])['rowCount'])

@@ -1,9 +1,9 @@
-<!-- 첫번째 소스 -->
-<!--file name : index.html-->
-<!--pwd : /project_name/app/templates/main/index.html-->
+
 <html>
     <head>
         This is Main page Head<br>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script type="text/javascript" src="/static/js/common.js?ver=0.0.3"></script>
     </head>
     <body>
         This is Main Page Body<br>
@@ -11,5 +11,16 @@
 
         <a href="/member/list">member</a>
         <br><a href="/login/form">login</a>
+
+        <script type="text/javascript">
+        $(document).ready(function(){
+            alert(datetimeClient());
+            alert(offsetClient());
+    
+
+        });
+            
+        </script>
     </body>
+
 </html>
