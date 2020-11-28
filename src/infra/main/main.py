@@ -7,12 +7,12 @@ main = Blueprint("main", __name__, url_prefix="/" + module)
 
 @main.route("/")
 def index():
-    return render_template("/main/index.html")
+    return render_template("/infra/main/index.html")
     # return 'index'
 
 @main.route("/test2")
 def test2():
-    return render_template("/main/test2.html")
+    return render_template("/infra/main/test2.html")
     # return 'index'
 
 

@@ -18,24 +18,24 @@ commonSqlObj = CommonSql()
 
 class Common():
 
-    def __init__(self, module):
+    def __init__(self, package, module):
         self.moduleListUrl = "/" + module + "/list"
         self.moduleFormUrl = "/" + module + "/form"
         self.moduleViewUrl = "/" + module + "/view"
 
-        self.moduleListHtml = "/" + module + "/" + module + "List.html"
-        self.moduleFormHtml = "/" + module + "/" + module + "Form.html"
-        self.moduleViewHtml = "/" + module + "/" + module + "View.html"
+        self.moduleListHtml = "/" + package + "/" + module + "/" + module + "List.html"
+        self.moduleFormHtml = "/" + package + "/" + module + "/" + module + "Form.html"
+        self.moduleViewHtml = "/" + package + "/" + module + "/" + module + "View.html"
 
-    def uploadFile(self, inputName, module, lastrowid, tablePrefix, offsetClient, datetimeClient):
+    def uploadFile(self, inputName, package, module, lastrowid, tablePrefix, offsetClient, datetimeClient):
         inputName = inputName
         fileKindCd = inputName[-1:]
         files = request.files.getlist(inputName)
         i = 0
         fileDefaultNy = 1
-        filePathFull = utilObj.setPathUpload(platform.system()) + "/" + module + "/" + inputName + "/" + str(dt.year) + "/" + str(dt.month) + "/" + str(dt.day) + "/" + str(dt.hour)
+        filePathFull = utilObj.setPathUpload(platform.system()) + "/" + package + "/" + module + "/" + inputName + "/" + str(dt.year) + "/" + str(dt.month) + "/" + str(dt.day) + "/" + str(dt.hour)
         # filePathFull = constantsObj.UPLOAD_FOLDER_FULL + "/" + module + "/" + inputName + "/" + str(dt.year) + "/" + str(dt.month) + "/" + str(dt.day) + "/" + str(dt.hour)
-        filePathForLink = constantsObj.PATH_UPLOAD_FOR_LINK + "/" + module + "/" + inputName + "/" + str(dt.year) + "/" + str(dt.month) + "/" + str(dt.day) + "/" + str(dt.hour)
+        filePathForLink = constantsObj.PATH_UPLOAD_FOR_LINK + "/" + package + "/" + module + "/" + inputName + "/" + str(dt.year) + "/" + str(dt.month) + "/" + str(dt.day) + "/" + str(dt.hour)
         
         if os.path.isdir(filePathFull):
             pass

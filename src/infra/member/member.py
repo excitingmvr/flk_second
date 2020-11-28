@@ -18,10 +18,11 @@ from src.infra.member.memberSql import MemberSql as ModuleSql
 dt = datetime.datetime.now()
 
 #<--
+package = "infra"
 module = "member"   
 
 constantsObj = Constants()
-commonObj = Common(module)
+commonObj = Common(package, module)
 databaseObj = Database()
 moduleSqlObj = ModuleSql()
 commonSqlObj = CommonSql()
@@ -246,8 +247,8 @@ def moduleInsert():
     dicInsertMain = setDicInsertMain('web')
     lastrowid = moduleSqlObj.insert((dicInsertMain))
     # #<- if attached files existed
-    commonObj.uploadFile("file1", module, lastrowid, "infrmember", request.form["offsetClient"], request.form["datetimeClient"])
-    commonObj.uploadFile("file2", module, lastrowid, "infrmember", request.form["offsetClient"], request.form["datetimeClient"])
+    commonObj.uploadFile("file1", package, module, lastrowid, "infrmember", request.form["offsetClient"], request.form["datetimeClient"])
+    commonObj.uploadFile("file2", package, module, lastrowid, "infrmember", request.form["offsetClient"], request.form["datetimeClient"])
     #<- if attached files existed end
     return redirect(commonObj.moduleViewUrl + "?pageThis=" + request.form["pageThis"] + "&seq=" + seqEncode(lastrowid) + strSchMain)
 
