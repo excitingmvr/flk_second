@@ -238,6 +238,13 @@ def moduleForm():
         #<-- if attached files are exist end
         return render_template(commonObj.moduleFormHtml, rt = row, rtFiles1 = files1, rtFiles1TotalSize = files1TotalSize, rtFiles2 = files2, rtFiles2TotalSize = files2TotalSize)
     
+@moduleObj.route("/findId")   
+def findId():
+    return render_template("/infra/member/findId.html")
+
+@moduleObj.route("/findPwd")   
+def findPwd():
+    return render_template("/infra/member/findPwd.html")
 
 ## db process #################################################
 

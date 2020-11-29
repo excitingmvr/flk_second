@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>memberForm</title>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/common.js?ver=0.0.1"></script>
+</head>
+<body>
+    <form>
+        <label for="fname">First name:</label><br>
+        <input type="text" id="fname" name="fname"><br>
+        <label for="lname">Last name:</label><br>
+        <input type="text" id="lname" name="lname"><br>
+        <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike"><br>
+        <button id="mainFormButton" type="button" >submit</button>
+    </form>
+    <p><a href="/member/findId">아이디찾기</a><br>
+        <a href="/member/findPwd">패스워드찾기</a><br>
+        <a href="/">Home</a>
+    </p>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            // alert(datetimeClient());
+            // alert(offsetClient());
+    
+
+        });
+</body>
+</html>
