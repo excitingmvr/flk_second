@@ -18,9 +18,9 @@ def test2():
     return render_template("/infra/main/test2.html")
     # return 'index'
 
-@main.route("/login")
-def login():
-    return render_template("/infra/main/login.html")
+# @main.route("/login")
+# def login():
+#     return render_template("/infra/main/login.html")
     # return 'index'
 
 # import sys

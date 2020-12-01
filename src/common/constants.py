@@ -8,6 +8,8 @@ class Constants():
     pageNum = 10
     index = 0
 
+    SECRET_KEY_FOR_SESION = "Anewlak11!!"
+
     #hashing (must 4 char)
     HASH_SUFFIX = 'KoNa'
 

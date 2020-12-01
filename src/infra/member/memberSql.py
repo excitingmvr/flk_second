@@ -49,6 +49,25 @@ class MemberSql():
         return databaseObj.executeFetchOne(sqlSelectOne,(Id))        
 
 
+    def getRowLogin(self, Id, password):
+        #<--
+        sqlSelectOne = """
+                        SELECT 
+                            ifmbSeq,
+                            ifmbAdminNy,
+                            ifmbFirstName,
+                            ifmbLastName,
+                            ifmbId
+                        FROM 
+                            infrmember 
+                        where 1=1 
+                            and ifmbDelNy = 0
+                            and ifmbId = %s
+                            and ifmbPassword = %s
+                        """
+        return databaseObj.executeFetchOne(sqlSelectOne,(Id, password))           
+
+
     def insert(self, dicInsertMain):
         #<--
         sqlInsert = """

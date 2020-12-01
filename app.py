@@ -13,6 +13,8 @@ sys.path.append(utilObj.setPathSource(platform.system()))
 
 app = Flask(__name__)
 
+app.secret_key = constantsObj.SECRET_KEY_FOR_SESION
+
 from src.infra.main.main import main
 from src.infra.member.member import member
 

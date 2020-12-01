@@ -1,6 +1,6 @@
 # -- coding: utf-8 --
 
-from flask import Blueprint, render_template, redirect, request
+from flask import Blueprint, render_template, redirect, request, session
 from flask_restful import Resource, Api
 from werkzeug.utils import secure_filename
 from random import *
@@ -130,16 +130,16 @@ class RestApiWithSeq(Resource):
     # delete
     def delete(self, seq):
         moduleSqlObj.delete(seqDecode(seq))
-        return {'status': 'success'}
+        return {"status": "success"}
 
     # update
     def put(self, seq):
         dicUpdateMain = setDicUpdateMain('json')
         moduleSqlObj.update((dicUpdateMain))
-        return {'seq': seq}
+        return {"seq": seq}
 
-moduleApi.add_resource(RestApiWithoutSeq, '/')
-moduleApi.add_resource(RestApiWithSeq, '/<seq>')
+moduleApi.add_resource(RestApiWithoutSeq, '/RAS/')
+moduleApi.add_resource(RestApiWithSeq, '/RAS/<seq>')
 
 ## REST Another #################################################
 
@@ -147,12 +147,12 @@ moduleApi.add_resource(RestApiWithSeq, '/<seq>')
 # uelete : change delNy value 1 -> 0
 def uelete(seq):
     moduleSqlObj.uelete(seqDecode(seq))
-    return {'seq': seq}
+    return {"seq": seq}
 
 @moduleObj.route('/checkId/<userId>', methods=['GET'])
 # find user
 def checkId(userId):
-    return {'result': moduleSqlObj.getRowCount(userId)}
+    return {"result": moduleSqlObj.getRowCount(userId)}
 
 ## web #######################################################
 
@@ -242,6 +242,7 @@ def moduleForm():
 def findId():
     return render_template("/infra/member/findId.html")
 
+
 @moduleObj.route("/findPwd")   
 def findPwd():
     return render_template("/infra/member/findPwd.html")
@@ -267,6 +268,7 @@ def moduleUpdate():
     moduleSqlObj.update((dicUpdateMain))
     return redirect(commonObj.moduleViewUrl + "?pageThis=" + request.form["pageThis"] + "&seq=" + request.form["seq"] + strSchMain)
 
+
 @moduleObj.route("/uelete", methods=['GET'])
 def moduleUelete():
     strSchMain = setStrSchForGetMain()
@@ -283,9 +285,37 @@ def moduleDelete():
 
 @moduleObj.route("/ajxCheckId", methods=['POST'])
 def ajxCheckId():
-    return str(moduleSqlObj.getRowCount(request.form['Id']))
-    
+    return json.dumps(moduleSqlObj.getRowCount(request.form['Id']))
 
+
+@moduleObj.route("/login")
+def login():
+    return render_template("/infra/member/login.html")
+
+
+@moduleObj.route("/ajxLogin", methods=['POST'])
+def ajxLogin():
+    row = moduleSqlObj.getRowLogin(request.form['ifmbId'], hashPwdUser(request.form['ifmbPassword'], 1))
+    if (row != None):
+        session['ss_seq'] = row['ifmbSeq']
+        session['ss_id'] = row['ifmbId']
+        session['ss_adminNy'] = row['ifmbAdminNy']
+        session['ss_firstName'] = row['ifmbFirstName']
+        session['ss_lastName'] = row['ifmbLastName']
+    else:
+        row = {"ifmbSeq": 0}
+    return json.dumps(row)
+
+
+@moduleObj.route("/ajxLogout")
+def ajxLogout():
+    session.pop('ss_seq',None)
+    session.pop('ss_id',None)
+    session.pop('ss_adminNy',None)
+    session.pop('ss_firstName',None)
+    session.pop('ss_lastName',None)
+    return {"status": "success"}
+    
 ## utils ########################################
 
 def setStrSchForGetMain():
@@ -294,6 +324,7 @@ def setStrSchForGetMain():
     else:
         strSchsMain = "&searchOption=" + request.args.get("searchOption") + "&searchValue=" + request.args.get("searchValue")
     return strSchsMain
+
 
 def setStrSchForPostMain(searchOption, searchValue):
     if searchOption == 'None' or searchOption == None:

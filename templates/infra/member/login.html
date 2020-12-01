@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>memberForm</title>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/common.js?ver=0.0.1"></script>
+</head>
+<body>
+    <form id="mainInsertForm" method="POST" action="">
+        <label for="fname">I D</label><br>
+        <input type="text" name="ifmbId"><br>
+        <label for="lname">Password:</label><br>
+        <input type="password" name="ifmbPassword" autocomplete="off"><br>
+        <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike"><br>
+        <button id="mainFormButton" type="button" >로그인</button>
+    </form>
+    <p><a href="/member/findId">아이디찾기</a><br>
+        <a href="/member/findPwd">패스워드찾기</a><br>
+        <a href="/">Home</a>
+    </p>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            // alert(datetimeClient());
+            // alert(offsetClient());
+        });
+
+        $("#mainFormButton").on("click", function(){
+            if(!checkNull($.trim($("input[name=ifmbId]").val()), "Id")) return false;
+            if(!checkNull($.trim($("input[name=ifmbPassword]").val()), "Password")) return false;
+
+            $.ajax({
+                url:'/member/ajxLogin',
+                type:'post',
+                data:{'ifmbId': $("input[name=ifmbId]").val(), 'ifmbPassword':$("input[name=ifmbPassword]").val()},
+                success: function(rt) {
+                    var rtJson = JSON.parse(rt);
+                    // $.each(rtJson, function (key, val) {
+                    //     alert(key+": "+val);
+                    // });
+                    if(Number(rtJson.ifmbSeq) > 0){
+                        location.replace('/');
+                    } else {
+                        alert("Id and Password are mismached!");
+                    }
+                },
+                error: function(err) {
+                    // pass
+                }
+            });
+        });
+
+        // mainInsertValidation = function(){
+        //     if(!checkNull($.trim($("input[name=ifmbFirstName]").val()), "First Name")) return false;
+        //     if(!checkNull($.trim($("input[name=ifmbLastName]").val()), "Last Name")) return false;
+
+        //     return true;
+        // }
+
+    </script>
+</body>
+</html>

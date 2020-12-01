@@ -195,7 +195,8 @@
                     type:'post',
                     data:{'Id': $("input[name=ifmbId]").val()},
                     success: function(rt) {
-                        if(Number(rt) > 0){
+                        var rtJson = JSON.parse(rt);
+                        if(rtJson.rowCount > 0){
                             $("#commentId").show();
                             $("#commentId").text('사용 불가능!');
                         } else {

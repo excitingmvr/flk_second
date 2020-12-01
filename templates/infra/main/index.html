@@ -8,9 +8,15 @@
     <body>
         This is Main Page Body<br>
         And This is Accepted Data : {{testDataHtml}} <br>
-
+        {% if session['ss_id'] %}
+            세션아이디 : {{session['ss_id']}}<br>
+            <button id="logoutButton" type="button" >logout</button><br>
+        {% else %}
+            <br><a href="/member/login">login</a><br>
+        {% endif %}
+        
         <a href="/member/list">member</a>
-        <br><a href="/login">login</a>
+        
 
         <script type="text/javascript">
         $(document).ready(function(){
@@ -18,6 +24,18 @@
             // alert(offsetClient());
     
 
+        });
+
+        $("#logoutButton").on("click", function(){
+            $.ajax({
+                url:'/member/ajxLogout',
+                success: function(rt) {
+                    location.replace('/');
+                },
+                error: function(err) {
+                    // pass
+                }
+            });
         });
             
         </script>
